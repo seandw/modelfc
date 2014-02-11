@@ -5,9 +5,10 @@ Concrete table class with standard values/tiebreakers for the MLS.
 from modelfc.abstract.table import Table
 from modelfc.concrete.team import Team
 
+
 class MLSTable(Table):
-    stats = {'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'ga': 0, 'rga': 0, 'rgf': 0,
-             'hga': 0, 'hgf': 0}
+    stats = {'w': 0, 'd': 0, 'l': 0, 'gf': 0, 'gd': 0, 'rgd': 0, 'rgf': 0,
+             'hgd': 0, 'hgf': 0}
 
     def __init__(self):
         Table.__init__(self)
@@ -35,10 +36,10 @@ class MLSTable(Table):
         home_score = int(home_score)
         away_score = int(away_score)
 
-        home = {'gf': home_score, 'ga': away_score, 'hgf': home_score,
-                'hga': away_score}
-        away = {'gf': away_score, 'ga': home_score, 'rgf': away_score,
-                'rga': home_score}
+        home = {'gf': home_score, 'gd': home_score - away_score,
+                'hgf': home_score, 'hgd': home_score - away_score}
+        away = {'gf': away_score, 'gd': away_score - home_score,
+                'rgf': away_score, 'rgd': away_score - home_score}
         if home_score == away_score:
             home['d'] = away['d'] = 1
         else:
@@ -49,9 +50,5 @@ class MLSTable(Table):
 
     @staticmethod
     def tiebreakers(team):
-        ogd = team['gf'] - team['ga']
-        rgd = team['rgf'] - team['rga']
-        hgd = team['hgf'] - team['hga']
-
-        return [team.value, team['w'], team['gf'], ogd, team['rgf'], rgd,
-                team['hgf'], hgd]
+        return [team.value, team['w'], team['gf'], team['gd'], team['rgf'],
+                team['rgd'], team['hgf'], team['hgd']]
